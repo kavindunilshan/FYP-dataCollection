@@ -161,3 +161,73 @@ results = kriging_for_all_metrics(filtered_rainfall, cities)
 # save_results_to_csv(results)
 #
 # print("Predicted rainfall data has been saved to 'predicted_rainfall.csv'.")
+
+
+
+import pandas as pd
+import numpy as np
+from pykrige.ok import OrdinaryKriging
+
+# Load the sorted data
+file_path = "../krigging/data/sorted_precipitation_data.csv"
+data = pd.read_csv(file_path)
+
+# Function to perform kriging for a given city location and predict precipitation
+def predict_precipitation(city_lat, city_lon, city_lvl):
+    # Get unique weeks from the data
+    unique_weeks = data['week'].unique()
+
+    # Store predictions for each week
+    predictions = []
+
+    # Iterate through each week
+    for week in unique_weeks:
+        # Filter data for the current week
+        week_data = data[data['week'] == week]
+
+        # Prepare input arrays for kriging
+        lats = week_data['lat'].values
+        lons = week_data['lon'].values
+        lvls = week_data['lvl'].values
+        avg_precip = week_data['precipitation_avg'].values
+        max_precip = week_data['precipitation_max'].values
+
+        # Combine spatial coordinates (lat, lon, lvl) into a single array for kriging
+        spatial_coords = np.column_stack((lats, lons, lvls))
+
+        # Ordinary Kriging for precipitation_avg
+        ok_avg = OrdinaryKriging(
+            lats, lons, avg_precip,
+            variogram_model='linear',
+            verbose=False,
+            enable_plotting=False
+        )
+        predicted_avg, _ = ok_avg.execute('points', city_lat, city_lon)
+
+        # Ordinary Kriging for precipitation_max
+        ok_max = OrdinaryKriging(
+            lats, lons, max_precip,
+            variogram_model='linear',
+            verbose=False,
+            enable_plotting=False
+        )
+        predicted_max, _ = ok_max.execute('points', city_lat, city_lon)
+
+        # Append predictions for this week
+        predictions.append({
+            'week': week,
+            'precipitation_avg': predicted_avg[0],
+            'precipitation_max': predicted_max[0]
+        })
+
+    # Convert predictions to DataFrame
+    prediction_df = pd.DataFrame(predictions)
+    return prediction_df
+
+# Example usage: predict precipitation for a city with given lat, lon, and lvl
+city_lat = 40.0
+city_lon = -75.0
+city_lvl = 100.0
+
+predictions = predict_precipitation(city_lat, city_lon, city_lvl)
+print(predictions)
