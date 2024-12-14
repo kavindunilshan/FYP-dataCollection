@@ -13,7 +13,7 @@ for index, row in filtered_df.iterrows():
     geocode = row['idIBGE']
 
     for year in range(2012, 2023):
-        url = f"https://info.dengue.mat.br/api/alertcity?geocode={geocode}&disease=dengue&format=csv&ew_start=1&ew_end=50&ey_start={year}&ey_end={year}"
+        url = f"https://info.dengue.mat.br/api/alertcity?geocode={geocode}&disease=dengue&format=csv&ew_start=0&ew_end=54&ey_start={year}&ey_end={year}"
 
         response = requests.get(url)
 
@@ -36,6 +36,6 @@ for index, row in filtered_df.iterrows():
             print(f"Failed to retrieve data for geocode {geocode} and year {year}")
 
 final_df = pd.concat(all_data, ignore_index=True)
-final_df.to_csv('dengue_data_filtered_RJ_2012_to_2022.csv', index=False)
+final_df.to_csv('weekly_dengue_data_RJ_2012_to_2022.csv', index=False)
 
 print("Data has been saved to dengue_data_filtered_RJ_2012_to_2022.csv")

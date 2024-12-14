@@ -7,7 +7,7 @@ fields = [
 ]
 
 # Read the CSV file, selecting only the specified fields
-dataset_path = 'csv/input/dengue_data_filtered_RJ_2012_to_2022.csv'  # Update with the path to your file
+dataset_path = 'weekly_dengue_data_RJ_2012_to_2022.csv'  # Update with the path to your file
 try:
     data = pd.read_csv(dataset_path, usecols=fields)
 
@@ -26,7 +26,7 @@ try:
     }, inplace=True)
 
     # Save the filtered data to a new file (optional)
-    filtered_path = 'csv/output/filtered_dengue_dataset.csv'
+    filtered_path = 'csv/output/52_week_dengue_dataset.csv'
     data.to_csv(filtered_path, index=False)
     print(f"Filtered data with renamed columns saved to {filtered_path}")
 
